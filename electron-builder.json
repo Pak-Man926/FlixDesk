@@ -1,0 +1,49 @@
+{
+  "appId": "io.github.Pak_Man926.FlixDesk",
+  "productName": "FlixDesk",
+  "executableName": "flixdesk",
+  "directories": {
+    "output": "dist-packages"
+  },
+  "files": [
+    "dist/**/*",
+    "assets/**/*",
+    "package.json"
+  ],
+  "linux": {
+    "target": [
+      {
+        "target": "AppImage",
+        "arch": ["x64", "arm64"]
+      },
+      {
+        "target": "deb",
+        "arch": ["x64", "arm64"]
+      },
+      {
+        "target": "tar.gz",
+        "arch": ["x64", "arm64"]
+      }
+    ],
+    "category": "Video",
+    "icon": "assets/icons/512x512.png",
+    "synopsis": "Unofficial Netflix Desktop Client for Linux",
+    "description": "A modern, feature-rich unofficial desktop web wrapper for Netflix featuring Linux MPRIS media controls, Widevine DRM support, 1080p stream unlock, system tray, and auto-skip capabilities.",
+    "desktop": {
+      "StartupWMClass": "FlixDesk",
+      "Actions": "PlayPause;Next;Previous;Settings",
+      "Keywords": "netflix;stream;video;movie;tv;series;mpris;media;"
+    }
+  },
+  "deb": {
+    "depends": [
+      "libnotify4",
+      "libsecret-1-0",
+      "libnss3",
+      "libasound2"
+    ],
+    "recommended": [
+      "google-chrome-stable | chromium-browser | chromium"
+    ]
+  }
+}

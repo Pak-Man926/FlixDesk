@@ -1,0 +1,44 @@
+{
+  "name": "flixdesk",
+  "productName": "FlixDesk",
+  "version": "1.0.0",
+  "description": "Unofficial Netflix desktop client for Linux with MPRIS, Widevine DRM, 1080p stream unlock, auto-skip, and system tray integration.",
+  "main": "dist/main/index.js",
+  "scripts": {
+    "start": "electron .",
+    "build:ts": "tsc",
+    "build": "npm run build:ts && electron-builder --linux",
+    "build:dir": "npm run build:ts && electron-builder --linux --dir",
+    "build:flatpak": "flatpak-builder --force-clean --user --install-deps-from=flathub build-dir packaging/flatpak/io.github.Pak_Man926.FlixDesk.yml"
+  },
+  "keywords": [
+    "netflix",
+    "linux",
+    "mpris",
+    "widevine",
+    "desktop-client",
+    "flatpak",
+    "flathub",
+    "pop-os",
+    "electron"
+  ],
+  "author": {
+    "name": "Pak-Man926",
+    "url": "https://github.com/Pak-Man926"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Pak-Man926/FlixDesk.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Pak-Man926/FlixDesk/issues"
+  },
+  "homepage": "https://github.com/Pak-Man926/FlixDesk#readme",
+  "license": "GPL-3.0-or-later",
+  "devDependencies": {
+    "electron": "^33.2.1",
+    "electron-builder": "^25.1.8",
+    "typescript": "^5.6.3",
+    "@types/node": "^22.9.0"
+  }
+}

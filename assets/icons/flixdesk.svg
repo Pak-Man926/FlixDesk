@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <!-- Background Gradient -->
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1e1e1e" />
+      <stop offset="100%" stop-color="#0a0a0a" />
+    </linearGradient>
+
+    <!-- Red Accent Gradient -->
+    <linearGradient id="redGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FF1F2D" />
+      <stop offset="100%" stop-color="#B81D24" />
+    </linearGradient>
+
+    <!-- Glass Reflection -->
+    <linearGradient id="glassGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.15" />
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0.0" />
+    </linearGradient>
+
+    <!-- Drop Shadow -->
+    <filter id="dropShadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="12" stdDeviation="16" flood-color="#000000" flood-opacity="0.6"/>
+    </filter>
+  </defs>
+
+  <!-- App Rounded Base -->
+  <rect x="32" y="32" width="448" height="448" rx="96" fill="url(#bgGrad)" stroke="#333333" stroke-width="4" filter="url(#dropShadow)"/>
+
+  <!-- Screen Frame -->
+  <rect x="72" y="88" width="368" height="264" rx="28" fill="#141414" stroke="url(#redGrad)" stroke-width="8"/>
+
+  <!-- Glass Highlight -->
+  <path d="M 76 116 C 76 100 88 88 104 88 L 408 88 C 424 88 436 100 436 116 L 436 210 L 76 270 Z" fill="url(#glassGrad)"/>
+
+  <!-- Cinema Play Emblem (Stylized Geometric Prism) -->
+  <polygon points="216,160 336,220 216,280" fill="url(#redGrad)" filter="url(#dropShadow)"/>
+  <polygon points="216,160 300,220 216,250" fill="#FF4D58"/>
+
+  <!-- Screen Stand -->
+  <path d="M 232 352 L 216 410 L 296 410 L 280 352 Z" fill="#2a2a2a" stroke="#444444" stroke-width="4"/>
+  <rect x="176" y="410" width="160" height="16" rx="8" fill="url(#redGrad)"/>
+
+  <!-- Indicator Light -->
+  <circle cx="256" cy="370" r="4" fill="#00E676"/>
+</svg>

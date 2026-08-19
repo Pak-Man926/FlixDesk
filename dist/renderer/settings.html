@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FlixDesk Preferences</title>
+  <link rel="stylesheet" href="settings.css">
+</head>
+<body>
+  <div class="settings-container">
+    <!-- Header -->
+    <header class="settings-header">
+      <div class="logo-area">
+        <svg class="logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <rect x="2" y="4" width="20" height="15" rx="3" fill="#E50914" stroke="#B81D24" stroke-width="1.5"/>
+          <polygon points="10,8 16,11.5 10,15" fill="#FFFFFF"/>
+          <line x1="8" y1="21" x2="16" y2="21" stroke="#E50914" stroke-width="2" stroke-linecap="round"/>
+          <line x1="12" y1="19" x2="12" y2="21" stroke="#E50914" stroke-width="2"/>
+        </svg>
+        <h1>FlixDesk <span class="badge">Preferences</span></h1>
+      </div>
+      <button class="close-btn" id="closeBtn" title="Close Preferences">&times;</button>
+    </header>
+
+    <!-- Content Area with Sidebar Tabs -->
+    <div class="settings-body">
+      <nav class="settings-sidebar">
+        <button class="nav-item active" data-tab="playback">
+          <span class="icon">▶</span> Playback
+        </button>
+        <button class="nav-item" data-tab="desktop">
+          <span class="icon">💻</span> Linux Desktop
+        </button>
+        <button class="nav-item" data-tab="social">
+          <span class="icon">🎮</span> Discord RPC
+        </button>
+        <button class="nav-item" data-tab="about">
+          <span class="icon">ℹ️</span> Diagnostics & About
+        </button>
+      </nav>
+
+      <main class="settings-content">
+        <!-- Tab 1: Playback -->
+        <section class="tab-panel active" id="tab-playback">
+          <h2>Playback Enhancements</h2>
+          <p class="section-desc">Automated playback controls and video resolution unlocks.</p>
+
+          <div class="setting-group">
+            <div class="setting-item">
+              <div class="setting-info">
+                <label for="autoSkipIntro">Auto-Skip Intros</label>
+                <p>Automatically skips opening intro sequences when the button appears.</p>
+              </div>
+              <label class="switch">
+                <input type="checkbox" id="autoSkipIntro">
+                <span class="slider"></span>
+              </label>
+            </div>
+
+            <div class="setting-item">
+              <div class="setting-info">
+                <label for="autoSkipRecap">Auto-Skip Recaps</label>
+                <p>Automatically skips previous episode summaries.</p>
+              </div>
+              <label class="switch">
+                <input type="checkbox" id="autoSkipRecap">
+                <span class="slider"></span>
+              </label>
+            </div>
+
+            <div class="setting-item">
+              <div class="setting-info">
+                <label for="autoPlayNext">Auto-Play Next Episode</label>
+                <p>Seamlessly transitions to the next episode when credits roll.</p>
+              </div>
+              <label class="switch">
+                <input type="checkbox" id="autoPlayNext">
+                <span class="slider"></span>
+              </label>
+            </div>
+
+            <div class="setting-item">
+              <div class="setting-info">
+                <label for="force1080p">Force 1080p Stream Unlock</label>
+                <p>Overrides Netflix's 720p Linux default and requests 1080p AVC/H.264 profiles (~5800 kbps).</p>
+              </div>
+              <label class="switch">
+                <input type="checkbox" id="force1080p">
+                <span class="slider"></span>
+              </label>
+            </div>
+          </div>
+        </section>
+
+        <!-- Tab 2: Desktop Integration -->
+        <section class="tab-panel" id="tab-desktop">
+          <h2>Linux Desktop & System Integration</h2>
+          <p class="section-desc">Integrations tailored for Pop!_OS COSMIC, GNOME, KDE, and Wayland.</p>
+
+          <div class="setting-group">
+            <div class="setting-item">
+              <div class="setting-info">
+                <label for="enableMpris">Linux MPRIS D-Bus Integration</label>
+                <p>Enables keyboard media keys, GNOME top bar controls, and lock screen media player widget.</p>
+              </div>
+              <label class="switch">
+                <input type="checkbox" id="enableMpris">
+                <span class="slider"></span>
+              </label>
+            </div>
+
+            <div class="setting-item">
+              <div class="setting-info">
+                <label for="enableTray">System Tray Indicator</label>
+                <p>Displays an icon in the Linux system tray with quick playback actions.</p>
+              </div>
+              <label class="switch">
+                <input type="checkbox" id="enableTray">
+                <span class="slider"></span>
+              </label>
+            </div>
+
+            <div class="setting-item">
+              <div class="setting-info">
+                <label for="closeToTray">Close to Tray</label>
+                <p>Minimizes the window to the system tray instead of exiting when closed.</p>
+              </div>
+              <label class="switch">
+                <input type="checkbox" id="closeToTray">
+                <span class="slider"></span>
+              </label>
+            </div>
+
+            <div class="setting-item">
+              <div class="setting-info">
+                <label for="enableHardwareAcceleration">Hardware Video Acceleration (VA-API)</label>
+                <p>Uses GPU decoding for smoother playback and lower CPU / battery usage. (Requires restart)</p>
+              </div>
+              <label class="switch">
+                <input type="checkbox" id="enableHardwareAcceleration">
+                <span class="slider"></span>
+              </label>
+            </div>
+
+            <div class="setting-item">
+              <div class="setting-info">
+                <label for="enableWayland">Native Wayland Support</label>
+                <p>Runs natively under Wayland on Pop!_OS, GNOME, and KDE. (Requires restart)</p>
+              </div>
+              <label class="switch">
+                <input type="checkbox" id="enableWayland">
+                <span class="slider"></span>
+              </label>
+            </div>
+          </div>
+        </section>
+
+        <!-- Tab 3: Social & Discord -->
+        <section class="tab-panel" id="tab-social">
+          <h2>Discord Rich Presence</h2>
+          <p class="section-desc">Share your watching activity on Discord automatically.</p>
+
+          <div class="setting-group">
+            <div class="setting-item">
+              <div class="setting-info">
+                <label for="enableDiscordRPC">Enable Discord Rich Presence</label>
+                <p>Displays "Watching &lt;Title&gt; on FlixDesk" on your Discord profile.</p>
+              </div>
+              <label class="switch">
+                <input type="checkbox" id="enableDiscordRPC">
+                <span class="slider"></span>
+              </label>
+            </div>
+
+            <div class="setting-item">
+              <div class="setting-info">
+                <label for="showEpisodeInDiscord">Show Season & Episode Title</label>
+                <p>Includes detailed episode names and season information in your Discord status.</p>
+              </div>
+              <label class="switch">
+                <input type="checkbox" id="showEpisodeInDiscord">
+                <span class="slider"></span>
+              </label>
+            </div>
+          </div>
+        </section>
+
+        <!-- Tab 4: Diagnostics & About -->
+        <section class="tab-panel" id="tab-about">
+          <h2>Diagnostics & System Information</h2>
+          <p class="section-desc">Status of DRM modules and system environment.</p>
+
+          <div class="diagnostics-card">
+            <h3>Widevine DRM Status</h3>
+            <div class="diag-row">
+              <span class="diag-label">Status:</span>
+              <span class="diag-value" id="widevineStatus">Checking...</span>
+            </div>
+            <div class="diag-row">
+              <span class="diag-label">Source:</span>
+              <span class="diag-value" id="widevineSource">-</span>
+            </div>
+            <div class="diag-row">
+              <span class="diag-label">Path:</span>
+              <span class="diag-value code" id="widevinePath">-</span>
+            </div>
+            <div class="diag-row">
+              <span class="diag-label">CDM Version:</span>
+              <span class="diag-value" id="widevineVersion">-</span>
+            </div>
+          </div>
+
+          <div class="about-card">
+            <h3>FlixDesk</h3>
+            <div class="diag-row">
+              <span class="diag-label">App ID:</span>
+              <span class="diag-value code">io.github.Pak_Man926.FlixDesk</span>
+            </div>
+            <div class="diag-row">
+              <span class="diag-label">Author:</span>
+              <span class="diag-value">Pak-Man926</span>
+            </div>
+            <div class="diag-row">
+              <span class="diag-label">Environment:</span>
+              <span class="diag-value" id="systemEnv">-</span>
+            </div>
+            <div class="legal-notice">
+              <strong>Legal Disclaimer:</strong> FlixDesk is an open-source unofficial web wrapper around netflix.com and is NOT affiliated with, endorsed by, or sponsored by Netflix, Inc. All trademarks and copyrighted materials belong to their respective owners.
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <!-- Footer -->
+    <footer class="settings-footer">
+      <span class="save-status" id="saveStatus">All changes saved automatically</span>
+      <button class="btn btn-primary" id="doneBtn">Done</button>
+    </footer>
+  </div>
+
+  <script src="settings.js"></script>
+</body>
+</html>
