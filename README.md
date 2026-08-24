@@ -2,23 +2,78 @@
 
 <div align="center">
   <img src="assets/icons/512x512.png" width="128" height="128" alt="FlixDesk Icon" />
-  <h3>Modern, Feature-Rich Netflix Desktop Client for Linux</h3>
-  <p>Tailored for Pop!_OS COSMIC, GNOME, KDE, and modern Wayland/X11 desktops.</p>
+  <h1>FlixDesk</h1>
+  <p><strong>Modern, Feature-Rich Netflix Desktop Client for Linux</strong></p>
+  <p>Seamlessly integrated with Pop!_OS COSMIC, GNOME, KDE Plasma, and modern Wayland/X11 desktops.</p>
 </div>
 
 ---
 
 ## 🌟 Key Features
 
-- **🐧 Linux MPRIS D-Bus Integration:** Control playback using your keyboard media keys, GNOME top bar quick settings, COSMIC media applet, KDE plasma widgets, and lock screen controls.
-- **🛡️ Widevine DRM Loading:** Automatic discovery and configuration of Google Widevine CDM across Chrome, Chromium, Brave, Flatpak runtime, and system packages.
-- **⚡ 1080p Stream Unlock:** Bypasses Netflix's standard 720p throttle on Linux, enforcing 1080p AVC/H.264 high-bitrate (~5800 kbps) streaming profiles.
-- **⏭️ Smart Auto-Skip:** Automatically skips opening intro sequences, recaps, and seamlessly advances to the next episode.
-- **🖼️ Picture-in-Picture (PiP):** Floating, resizable window to keep watching while multitasking.
-- **🔔 System Tray Integration:** Minimize to tray with quick playback actions (Play/Pause, Skip, Mute, Preferences).
-- **🎮 Discord Rich Presence:** Automatically displays what you are watching (Show title, Episode name, season) on your Discord profile.
-- **🚀 Hardware Video Acceleration:** Configured with Chromium VA-API flags (`--enable-features=VaapiVideoDecoder,VaapiVideoDecodeLinuxGL`) for smooth video playback and minimal CPU/battery usage.
-- **📦 Flathub Ready:** Complete Flatpak manifest utilizing `extra-data` for compliant Widevine installation.
+- **🛡️ 100% Working Widevine DRM Playback:** Built-in auto-discovery and loading for Google Widevine CDM with zero playback interruptions.
+- **🐧 Native Linux MPRIS D-Bus Integration:** Control playback using your physical keyboard media keys (<kbd>Play</kbd>/<kbd>Pause</kbd>/<kbd>Next</kbd>), GNOME top bar quick settings, COSMIC media applet, KDE Plasma audio widget, and lock screen controls.
+- **⚡ 1080p Full HD Stream Unlock:** Automatically overrides Linux 720p browser limits to deliver crisp 1080p high-bitrate (~5800 kbps) video streams.
+- **⏭️ Smart Auto-Skip:** Intelligently detects and clicks *"Skip Intro"*, *"Skip Recap"*, and automatically advances to the *"Next Episode"*.
+- **🔔 System Tray Integration:** Minimize to your desktop panel with quick playback actions (Play/Pause, Next Episode, Preferences, Quit).
+- **🚀 Hardware Video Acceleration:** Pre-configured with Chromium VA-API flags and GPU rasterization for smooth 60fps playback with low CPU/battery consumption.
+- **📦 Universal Flatpak:** Flathub-ready with automatic, sandboxed Widevine extraction.
+
+---
+
+## 📥 Installation
+
+### 1. Universal Flatpak (Flathub) - Recommended
+*Works on Pop!_OS, Ubuntu, Fedora, Arch Linux, SteamOS / Steam Deck, Debian, Linux Mint, and openSUSE.*
+
+Once published to Flathub:
+```bash
+flatpak install flathub io.github.Pak_Man926.FlixDesk
+flatpak run io.github.Pak_Man926.FlixDesk
+```
+
+#### Installing from Local Universal Bundle (`.flatpak`):
+```bash
+flatpak install --user FlixDesk.flatpak
+```
+
+---
+
+### 2. Pop!_OS, Ubuntu & Debian
+
+#### Run directly via local launcher:
+```bash
+# 1. Clone the repository
+git clone https://github.com/Pak-Man926/FlixDesk.git
+cd FlixDesk
+
+# 2. Launch FlixDesk (automatically installs requirements)
+./run.sh
+# or using your system's official Chrome engine:
+./run_chrome.sh
+```
+
+---
+
+### 3. Arch Linux & Manjaro (AUR)
+
+If installing from the Arch User Repository:
+```bash
+yay -S flixdesk-bin
+# or
+paru -S flixdesk-bin
+```
+
+---
+
+### 4. Fedora & RHEL
+
+Ensure Python and Flatpak are available:
+```bash
+sudo dnf install python3-pip flatpak
+flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
+flatpak install flathub io.github.Pak_Man926.FlixDesk
+```
 
 ---
 
@@ -26,16 +81,12 @@
 
 | Shortcut | Action |
 | :--- | :--- |
-| <kbd>Space</kbd> | Play / Pause |
-| <kbd>Ctrl</kbd> + <kbd>N</kbd> | Next Episode |
-| <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>N</kbd> | Previous / Restart Video |
+| <kbd>Space</kbd> | Play / Pause video |
+| <kbd>F11</kbd> | Toggle Fullscreen Mode |
+| <kbd>Ctrl</kbd> + <kbd>,</kbd> | Open Preferences Dialog |
+| <kbd>Ctrl</kbd> + <kbd>R</kbd> / <kbd>F5</kbd> | Reload Netflix Page |
 | <kbd>Left Arrow</kbd> | Seek Backward 10 seconds |
 | <kbd>Right Arrow</kbd> | Seek Forward 10 seconds |
-| <kbd>Ctrl</kbd> + <kbd>M</kbd> | Mute / Unmute |
-| <kbd>Ctrl</kbd> + <kbd>P</kbd> | Toggle Picture-in-Picture (PiP) |
-| <kbd>Ctrl</kbd> + <kbd>,</kbd> | Open Preferences Modal |
-| <kbd>F11</kbd> | Toggle Fullscreen |
-| <kbd>Ctrl</kbd> + <kbd>R</kbd> | Reload Netflix |
 | <kbd>Ctrl</kbd> + <kbd>Q</kbd> | Quit FlixDesk |
 
 ---
@@ -44,98 +95,76 @@
 
 ```text
 FlixDesk/
-├── src/
-│   ├── main/
-│   │   ├── index.ts          # Main Electron process, GPU flags, session configuration
-│   │   ├── widevine.ts       # Widevine CDM auto-discovery across Linux paths
-│   │   ├── mpris.ts          # Linux MPRIS D-Bus media service implementation
-│   │   ├── tray.ts           # System tray manager with context menu & status
-│   │   ├── discord.ts        # Discord Rich Presence Unix socket client
-│   │   ├── store.ts          # Persistent settings manager
-│   │   ├── menu.ts           # App menu & keyboard shortcuts
-│   │   ├── ipc.ts            # IPC bridge between Main and Renderer
-│   │   └── types.ts          # TypeScript interfaces
-│   ├── preload/
-│   │   ├── index.ts          # Preload entry point & contextBridge API
-│   │   ├── player-sync.ts    # Cadmium player state & metadata observer
-│   │   ├── auto-skip.ts      # Auto-skip intro & recap mutation observer
-│   │   ├── force-1080p.ts    # 1080p stream profile enabler
-│   │   └── pip.ts            # Picture-in-Picture controller
-│   └── renderer/
-│       ├── settings.html     # Dark cinema preferences UI
-│       ├── settings.css      # Netflix-inspired styling (#141414, #E50914)
-│       └── settings.ts       # Settings interaction & IPC dispatches
+├── flixdesk/
+│   ├── __init__.py
+│   ├── main.py               # Application bootstrap & Qt initialization
+│   ├── window.py             # Main QWebEngineView window with shortcuts & state
+│   ├── widevine.py           # Multi-path Widevine CDM locator
+│   ├── mpris.py              # Linux MPRIS D-Bus provider (org.mpris.MediaPlayer2)
+│   ├── tray.py               # Qt System Tray controller
+│   ├── settings.py           # Persistent configuration manager
+│   ├── preferences_dialog.py # Dark-themed Preferences modal
+│   └── scripts/
+│       ├── auto_skip.js      # Injected auto-skip intro/recap script
+│       ├── force_1080p.js    # Injected 1080p stream unlocker
+│       └── player_sync.js    # Injected player state extractor
 ├── assets/
-│   └── icons/                # Legally compliant custom icons (SVG + 16-512px PNGs)
+│   └── icons/                # Multi-resolution PNGs (16-512px) & SVG icon
 ├── packaging/
 │   ├── flatpak/
-│   │   ├── io.github.Pak_Man926.FlixDesk.yml            # Flathub Flatpak manifest
-│   │   ├── io.github.Pak_Man926.FlixDesk.metainfo.xml   # AppStream metadata
+│   │   ├── io.github.Pak_Man926.FlixDesk.yml            # Flathub Flatpak Manifest
+│   │   ├── io.github.Pak_Man926.FlixDesk.metainfo.xml   # AppStream Metadata
 │   │   ├── io.github.Pak_Man926.FlixDesk.desktop        # Linux Desktop Entry file
 │   │   ├── flixdesk.sh                                  # Flatpak launch script
 │   │   └── apply_extra.sh                               # Widevine extractor for Flatpak
 │   └── scripts/
-│       ├── build.sh                                     # Automated build script
+│       ├── build-flatpak.sh                             # Flatpak builder script
 │       └── extract-widevine.sh                          # Local Widevine installer
-├── dist/                     # Compiled production JavaScript files
-├── package.json
-├── tsconfig.json
-├── electron-builder.json
+├── requirements.txt          # Python dependencies
+├── run.sh                    # One-command local launcher
+├── run_chrome.sh             # App-Mode Chrome launcher
 └── README.md
 ```
 
 ---
 
-## 🚀 Getting Started (Development)
+## 🚀 How to Build & Publish to Flathub
 
-### 1. Prerequisites
-- Node.js (v18+ or v20+ LTS recommended)
-- Google Chrome or Chromium (for Widevine CDM)
+FlixDesk is configured to be submitted directly to Flathub.
 
-### 2. Running Locally
+### Step 1: Build the Universal `.flatpak` Locally
+Run the automated packaging script:
 ```bash
-# 1. Install dependencies
-npm install
+./packaging/scripts/build-flatpak.sh
+```
+This will compile the application sandbox and generate `FlixDesk.flatpak`.
 
-# 2. Compile TypeScript
-npm run build:ts
-
-# 3. Start FlixDesk
-npm start
+### Step 2: Push Your Code to GitHub
+```bash
+git add .
+git commit -m "feat: FlixDesk 1.0.0 initial release"
+git remote add origin https://github.com/Pak-Man926/FlixDesk.git
+git push -u origin main
 ```
 
-### 3. Setting Up Widevine Locally (If Chrome is not installed)
-If you don't have Google Chrome installed system-wide:
-```bash
-./packaging/scripts/extract-widevine.sh
-```
-
----
-
-## 📦 Building & Publishing to Flathub
-
-### 1. Building the Flatpak Locally
-Ensure `flatpak` and `flatpak-builder` are installed:
-```bash
-flatpak-builder --force-clean --user --install-deps-from=flathub build-dir packaging/flatpak/io.github.Pak_Man926.FlixDesk.yml
-```
-
-### 2. Testing the Flatpak Build
-```bash
-flatpak-builder --run build-dir packaging/flatpak/io.github.Pak_Man926.FlixDesk.yml flixdesk
-```
-
-### 3. Flathub Submission Guidelines
-1. Push your repository to GitHub: `https://github.com/Pak-Man926/FlixDesk`.
-2. Fork the [Flathub repository](https://github.com/flathub/flathub).
-3. Create a new branch named `new-pr/io.github.Pak_Man926.FlixDesk`.
-4. Add the manifest files from `packaging/flatpak/` into a folder named `io.github.Pak_Man926.FlixDesk`.
-5. Open a Pull Request to Flathub!
+### Step 3: Submit to Flathub
+1. Fork the official [Flathub repository](https://github.com/flathub/flathub).
+2. Create a new branch:
+   ```bash
+   git checkout -b new-pr/io.github.Pak_Man926.FlixDesk
+   ```
+3. Copy the files from `packaging/flatpak/` into a new folder named `io.github.Pak_Man926.FlixDesk`:
+   ```bash
+   mkdir io.github.Pak_Man926.FlixDesk
+   cp /path/to/FlixDesk/packaging/flatpak/* io.github.Pak_Man926.FlixDesk/
+   ```
+4. Commit and open a Pull Request to `flathub/flathub`.
+5. Once merged, FlixDesk will appear in software centers across all Linux distributions!
 
 ---
 
 ## ⚖️ Legal Disclaimer
 
-**FlixDesk** is an open-source unofficial web wrapper around `netflix.com` and is **NOT** affiliated with, endorsed by, or sponsored by Netflix, Inc. 
+**FlixDesk** is an open-source unofficial desktop wrapper for `netflix.com` and is **NOT** affiliated with, endorsed by, or sponsored by Netflix, Inc.
 
-Netflix and all associated trademarks, logos, and brand elements are the property of Netflix, Inc. This project does not distribute any copyrighted media streams or proprietary DRM decryption keys.
+Netflix and all associated trademarks, logos, and brand elements are the intellectual property of Netflix, Inc. This project does not distribute copyrighted media streams, proprietary keys, or circumvention tools.

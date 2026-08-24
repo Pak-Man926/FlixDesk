@@ -1,7 +1,9 @@
 "use strict";
+/**
+ * Picture-in-Picture (PiP) controller
+ */
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.PipController = void 0;
-
 class PipController {
     static async togglePip() {
         try {

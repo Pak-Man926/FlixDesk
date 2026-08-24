@@ -1,9 +1,7 @@
 app-id: io.github.Pak_Man926.FlixDesk
-runtime: org.freedesktop.Platform
-runtime-version: '24.08'
-sdk: org.freedesktop.Sdk
-base: org.electronjs.Electron2.BaseApp
-base-version: '24.08'
+runtime: org.kde.Platform
+runtime-version: '6.8'
+sdk: org.kde.Sdk
 command: flixdesk
 separate-locales: false
 
@@ -20,14 +18,10 @@ finish-args:
 
   # Linux Desktop MPRIS D-Bus & Notifications
   - --socket=session-bus
-  - --own-name=org.mpris.MediaPlayer2.flixdesk
   - --own-name=org.mpris.MediaPlayer2.FlixDesk
   - --talk-name=org.freedesktop.Notifications
   - --talk-name=org.freedesktop.ScreenSaver
   - --talk-name=org.kde.StatusNotifierWatcher
-
-  # Discord Rich Presence socket access
-  - --filesystem=xdg-run/discord-ipc-*:create
 
 modules:
   # 1. Main FlixDesk Application
@@ -36,9 +30,9 @@ modules:
     build-commands:
       # Install application files
       - install -dm755 /app/lib/flixdesk
-      - cp -r dist /app/lib/flixdesk/
+      - cp -r flixdesk /app/lib/flixdesk/
       - cp -r assets /app/lib/flixdesk/
-      - cp package.json /app/lib/flixdesk/
+      - cp flixdesk.py /app/lib/flixdesk/
 
       # Install launch wrapper
       - install -Dm755 packaging/flatpak/flixdesk.sh /app/bin/flixdesk
@@ -65,7 +59,6 @@ modules:
         path: ../../
 
   # 2. Extra-Data: Widevine DRM from official Google Chrome deb package
-  # Downloaded securely at installation time on user's machine (not hosted in source repo)
   - name: widevine-extra-data
     buildsystem: simple
     build-commands:
@@ -74,7 +67,7 @@ modules:
       - type: extra-data
         filename: google-chrome-stable.deb
         url: https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
-        sha256: 0000000000000000000000000000000000000000000000000000000000000000 # Flathub bot auto-updates this hash
+        sha256: 0000000000000000000000000000000000000000000000000000000000000000
         size: 110000000
         x-checker-data:
           type: debian-repo

@@ -1,12 +1,16 @@
 "use strict";
+/**
+ * Netflix 1080p Stream Unlocker for Linux
+ * Intercepts Cadmium player manifest requests and enforces 1080p AVC/H.264 stream selection.
+ */
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.inject1080pUnlocker = void 0;
-
+exports.inject1080pUnlocker = inject1080pUnlocker;
 function inject1080pUnlocker() {
     const scriptContent = `
     (function() {
       console.log('[FlixDesk] Initializing 1080p stream profile enabler...');
 
+      // Intercept XHR / Fetch for Netflix Cadmium Manifests
       const originalOpen = XMLHttpRequest.prototype.open;
       const originalSend = XMLHttpRequest.prototype.send;
 
@@ -21,9 +25,10 @@ function inject1080pUnlocker() {
           this.onreadystatechange = function() {
             if (this.readyState === 4 && this.status === 200) {
               try {
+                // Intercept and patch response text if needed
                 const text = this.responseText;
                 if (text && text.includes('videoTracks')) {
-                  // Manifest stream profile hooks
+                  // Custom stream profile filter
                 }
               } catch (e) {
                 // Ignore parse errors
@@ -37,6 +42,7 @@ function inject1080pUnlocker() {
         return originalSend.apply(this, arguments);
       };
 
+      // Monkey-patch Netflix Video Player API once loaded
       function patchVideoPlayerApi() {
         try {
           const netflix = window.netflix;
@@ -51,6 +57,7 @@ function inject1080pUnlocker() {
         }
       }
 
+      // Check periodically until Netflix APIs are initialized
       const checkInterval = setInterval(() => {
         if (window.netflix) {
           patchVideoPlayerApi();
@@ -59,9 +66,9 @@ function inject1080pUnlocker() {
       }, 1000);
     })();
   `;
+    // Inject script directly into main DOM execution context
     const script = document.createElement('script');
     script.textContent = scriptContent;
     (document.head || document.documentElement).appendChild(script);
     script.remove();
 }
-exports.inject1080pUnlocker = inject1080pUnlocker;

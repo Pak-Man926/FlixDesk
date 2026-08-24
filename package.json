@@ -5,7 +5,7 @@
   "description": "Unofficial Netflix desktop client for Linux with MPRIS, Widevine DRM, 1080p stream unlock, auto-skip, and system tray integration.",
   "main": "dist/main/index.js",
   "scripts": {
-    "start": "electron .",
+    "start": "electron --no-sandbox --disable-gpu-sandbox .",
     "build:ts": "tsc",
     "build": "npm run build:ts && electron-builder --linux",
     "build:dir": "npm run build:ts && electron-builder --linux --dir",
@@ -36,7 +36,7 @@
   "homepage": "https://github.com/Pak-Man926/FlixDesk#readme",
   "license": "GPL-3.0-or-later",
   "devDependencies": {
-    "electron": "^33.2.1",
+    "electron": "github:castlabs/electron-releases#v33.2.0+wvcus",
     "electron-builder": "^25.1.8",
     "typescript": "^5.6.3",
     "@types/node": "^22.9.0"

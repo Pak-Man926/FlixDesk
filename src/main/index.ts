@@ -1,4 +1,4 @@
-import { app, BrowserWindow, session, shell, nativeImage } from 'electron';
+import { app, BrowserWindow, session, shell, nativeImage, Menu } from 'electron';
 import * as path from 'path';
 import { store } from './store';
 import { widevineManager } from './widevine';
@@ -13,9 +13,10 @@ const enableHwAccel = store.get('enableHardwareAcceleration');
 const enableWayland = store.get('enableWayland');
 widevineManager.applySwitches(enableHwAccel, enableWayland);
 
-// Standard Desktop Chrome User-Agent (strips Electron identifier)
+// Dynamic Chrome User-Agent matching Electron's Chromium engine
+const chromeVersion = process.versions.chrome || '128.0.0.0';
 const DEFAULT_USER_AGENT =
-  'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36';
+  `Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/${chromeVersion} Safari/537.36`;
 
 let mainWindow: BrowserWindow | null = null;
 let settingsWindow: BrowserWindow | null = null;
@@ -99,14 +100,34 @@ function createMainWindow(): BrowserWindow {
     saveBounds();
   });
 
-  // Handle external links (open in default Linux browser)
-  win.webContents.setWindowOpenHandler(({ url }) => {
-    if (!url.includes('netflix.com')) {
-      shell.openExternal(url);
-      return { action: 'deny' };
+  // Keyboard shortcut handler that bypasses webpage event interception
+  win.webContents.on('before-input-event', (event, input) => {
+    if (input.type === 'keyDown') {
+      // Toggle DevTools (F12 or Ctrl+Shift+I)
+      if (input.key === 'F12' || (input.control && input.shift && input.key.toLowerCase() === 'i')) {
+        win.webContents.toggleDevTools();
+        event.preventDefault();
+      }
+      // Toggle Fullscreen (F11)
+      else if (input.key === 'F11') {
+        win.setFullScreen(!win.isFullScreen());
+        event.preventDefault();
+      }
+      // Preferences (Ctrl+,)
+      else if (input.control && input.key === ',') {
+        createSettingsWindow();
+        event.preventDefault();
+      }
+      // Reload (Ctrl+R)
+      else if (input.control && input.key.toLowerCase() === 'r') {
+        win.webContents.reload();
+        event.preventDefault();
+      }
     }
-    return { action: 'allow' };
   });
+
+  // Automatically open DevTools in detached window for diagnostics
+  win.webContents.openDevTools({ mode: 'detach' });
 
   // Load Netflix
   const userAgent = store.get('customUserAgent') || DEFAULT_USER_AGENT;
@@ -151,8 +172,9 @@ function createSettingsWindow(): void {
 function configureSession(): void {
   const userAgent = store.get('customUserAgent') || DEFAULT_USER_AGENT;
 
-  // Set user agent across default session
+  // Set user agent across default session and app fallback
   session.defaultSession.setUserAgent(userAgent);
+  app.userAgentFallback = userAgent;
 
   // Strip Electron identifier from request headers
   session.defaultSession.webRequest.onBeforeSendHeaders((details, callback) => {
@@ -161,14 +183,15 @@ function configureSession(): void {
     callback({ cancel: false, requestHeaders });
   });
 
-  // Enable DRM certificate handling & permissions
+  // Automatically grant DRM (Widevine / protected-media-identifier) and media permissions
   session.defaultSession.setPermissionRequestHandler((webContents, permission, callback) => {
-    const allowedPermissions = ['media', 'mediaKeySystem', 'fullscreen', 'notifications'];
-    if (allowedPermissions.includes(permission)) {
-      callback(true);
-    } else {
-      callback(false);
-    }
+    // Chromium permission for Widevine / DRM is 'protected-media-identifier' or 'mediaKeySystem'
+    console.log(`[FlixDesk Session] Permission requested: ${permission}`);
+    callback(true);
+  });
+
+  session.defaultSession.setPermissionCheckHandler((webContents, permission, requestingOrigin) => {
+    return true;
   });
 }
 
@@ -194,6 +217,19 @@ function handleAppAction(action: string, data?: any): void {
 }
 
 app.whenReady().then(async () => {
+  // 1. Support Widevine Components API if present (Castlabs / Widevine EVS)
+  try {
+    const electronModule = require('electron');
+    if (electronModule.components && typeof electronModule.components.whenReady === 'function') {
+      console.log('[FlixDesk] Checking Widevine components subsystem...');
+      await electronModule.components.whenReady();
+      const status = typeof electronModule.components.status === 'function' ? electronModule.components.status() : 'ready';
+      console.log('[FlixDesk] Widevine components status:', JSON.stringify(status));
+    }
+  } catch (e) {
+    console.log('[FlixDesk] Online component updater skipped, using local Widevine CDM.');
+  }
+
   configureSession();
 
   mainWindow = createMainWindow();

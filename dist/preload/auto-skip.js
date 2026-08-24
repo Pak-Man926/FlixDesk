@@ -1,15 +1,13 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AutoSkipper = void 0;
-
 class AutoSkipper {
-    constructor() {
-        this.observer = null;
-        this.autoSkipIntro = true;
-        this.autoSkipRecap = true;
-        this.autoPlayNext = true;
-        this.lastSkipTimestamp = 0;
-    }
+    observer = null;
+    autoSkipIntro = true;
+    autoSkipRecap = true;
+    autoPlayNext = true;
+    lastSkipTimestamp = 0;
+    constructor() { }
     updateConfig(config) {
         if (config.autoSkipIntro !== undefined)
             this.autoSkipIntro = config.autoSkipIntro;
@@ -34,8 +32,10 @@ class AutoSkipper {
     }
     checkAndSkip() {
         const now = Date.now();
+        // Debounce checks to avoid rapid repeat clicks
         if (now - this.lastSkipTimestamp < 500)
             return;
+        // 1. Skip Intro
         if (this.autoSkipIntro) {
             const skipIntroBtn = document.querySelector('[data-uia="player-skip-intro"], button[aria-label="Skip Intro"], .watch-video--skip-content-button');
             if (skipIntroBtn && this.isElementVisible(skipIntroBtn)) {
@@ -48,6 +48,7 @@ class AutoSkipper {
                 }
             }
         }
+        // 2. Skip Recap
         if (this.autoSkipRecap) {
             const skipRecapBtn = document.querySelector('[data-uia="player-skip-recap"], button[aria-label="Skip Recap"], .watch-video--skip-content-button');
             if (skipRecapBtn && this.isElementVisible(skipRecapBtn)) {
@@ -57,6 +58,7 @@ class AutoSkipper {
                 return;
             }
         }
+        // 3. Auto-play Next Episode
         if (this.autoPlayNext) {
             const nextEpBtn = document.querySelector('[data-uia="next-episode-seamless-button"], [data-uia="next-episode-seamless-button-draining"]');
             if (nextEpBtn && this.isElementVisible(nextEpBtn)) {

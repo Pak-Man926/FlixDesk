@@ -171,27 +171,37 @@ export class WidevineManager {
     const info = this.discoverWidevine();
 
     if (info.found && info.path && info.version) {
+      const cdmDir = info.path.includes('_platform_specific')
+        ? path.resolve(path.dirname(info.path), '../..')
+        : path.dirname(info.path);
+
+      // Support all variations of Chromium Widevine command-line switches
+      app.commandLine.appendSwitch('widevine-cdm-path', cdmDir);
+      app.commandLine.appendSwitch('widevine-cdm-version', info.version);
       app.commandLine.appendSwitch('widevinecdm-path', info.path);
       app.commandLine.appendSwitch('widevinecdm-version', info.version);
-      console.log(`[Widevine] Configured Electron switches: path=${info.path}, version=${info.version}`);
+
+      console.log(`[Widevine] Registered Widevine CDM: dir=${cdmDir}, file=${info.path}, version=${info.version}`);
     }
 
-    // Hardware Acceleration & VA-API video decoding for Linux
+    // GPU & Hardware Acceleration for Linux
+    app.commandLine.appendSwitch('disable-gpu-sandbox');
+    app.commandLine.appendSwitch('no-sandbox');
+
     if (enableHwAccel) {
-      app.commandLine.appendSwitch('enable-features', 'VaapiVideoDecoder,VaapiVideoDecodeLinuxGL,CanvasOopRasterization');
-      app.commandLine.appendSwitch('enable-accelerated-video-decode');
-      app.commandLine.appendSwitch('enable-gpu-rasterization');
       app.commandLine.appendSwitch('ignore-gpu-blocklist');
+      app.commandLine.appendSwitch('enable-gpu-rasterization');
+      app.commandLine.appendSwitch('enable-accelerated-video-decode');
     }
 
     // Wayland support
     if (enableWayland && (process.env.XDG_SESSION_TYPE === 'wayland' || process.env.WAYLAND_DISPLAY)) {
       app.commandLine.appendSwitch('ozone-platform-hint', 'auto');
-      app.commandLine.appendSwitch('enable-features', 'WaylandWindowDecorations');
     }
 
     // Media and DRM flags
     app.commandLine.appendSwitch('enable-encrypted-media');
+    app.commandLine.appendSwitch('no-verify-widevine-cdm');
     app.commandLine.appendSwitch('autoplay-policy', 'no-user-gesture-required');
   }
 }

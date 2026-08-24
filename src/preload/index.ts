@@ -26,6 +26,23 @@ window.addEventListener('DOMContentLoaded', () => {
     autoSkipper.start();
     inject1080pUnlocker();
 
+    // Verify DRM / Widevine EME capability
+    if (navigator.requestMediaKeySystemAccess) {
+      navigator.requestMediaKeySystemAccess('com.widevine.alpha', [
+        {
+          initDataTypes: ['cenc'],
+          audioCapabilities: [{ contentType: 'audio/mp4;codecs="mp4a.40.2"' }],
+          videoCapabilities: [{ contentType: 'video/mp4;codecs="avc1.42E01E"' }],
+        },
+      ])
+      .then(() => {
+        console.log('[FlixDesk DRM] com.widevine.alpha is supported and active!');
+      })
+      .catch((err) => {
+        console.warn('[FlixDesk DRM] com.widevine.alpha check:', err.message);
+      });
+    }
+
     // Listen for PiP command
     ipcRenderer.on('player:command', (_event, { command }) => {
       if (command === 'togglePip') {

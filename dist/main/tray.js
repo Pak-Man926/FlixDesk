@@ -1,25 +1,56 @@
 "use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || (function () {
+    var ownKeys = function(o) {
+        ownKeys = Object.getOwnPropertyNames || function (o) {
+            var ar = [];
+            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
+            return ar;
+        };
+        return ownKeys(o);
+    };
+    return function (mod) {
+        if (mod && mod.__esModule) return mod;
+        var result = {};
+        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
+        __setModuleDefault(result, mod);
+        return result;
+    };
+})();
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.trayManager = exports.TrayManager = void 0;
 const electron_1 = require("electron");
-const path = require("path");
-
+const path = __importStar(require("path"));
 class TrayManager {
-    constructor() {
-        this.tray = null;
-        this.mainWindow = null;
-        this.onActionCallback = null;
-        this.currentState = {
-            isPlaying: false,
-            isBuffering: false,
-            title: 'Netflix',
-            duration: 0,
-            currentTime: 0,
-            volume: 1.0,
-            isMuted: false,
-            playbackRate: 1.0,
-        };
-    }
+    tray = null;
+    mainWindow = null;
+    onActionCallback = null;
+    currentState = {
+        isPlaying: false,
+        isBuffering: false,
+        title: 'Netflix',
+        duration: 0,
+        currentTime: 0,
+        volume: 1.0,
+        isMuted: false,
+        playbackRate: 1.0,
+    };
+    constructor() { }
     init(window, onAction) {
         this.mainWindow = window;
         this.onActionCallback = onAction;
@@ -39,7 +70,7 @@ class TrayManager {
         return assetPath;
     }
     updateState(state) {
-        this.currentState = Object.assign(Object.assign({}, this.currentState), state);
+        this.currentState = { ...this.currentState, ...state };
         this.updateContextMenu();
     }
     updateContextMenu() {
@@ -59,35 +90,35 @@ class TrayManager {
             {
                 label: isPlaying ? 'Pause' : 'Play',
                 accelerator: 'Space',
-                click: () => { var _a; return (_a = this.onActionCallback) === null || _a === void 0 ? void 0 : _a.call(this, 'playpause'); },
+                click: () => this.onActionCallback?.('playpause'),
             },
             {
                 label: 'Next Episode',
                 accelerator: 'CmdOrCtrl+N',
-                click: () => { var _a; return (_a = this.onActionCallback) === null || _a === void 0 ? void 0 : _a.call(this, 'next'); },
+                click: () => this.onActionCallback?.('next'),
             },
             {
                 label: 'Skip Intro / Recap',
-                click: () => { var _a; return (_a = this.onActionCallback) === null || _a === void 0 ? void 0 : _a.call(this, 'skipIntro'); },
+                click: () => this.onActionCallback?.('skipIntro'),
             },
             {
                 label: this.currentState.isMuted ? 'Unmute' : 'Mute',
-                click: () => { var _a; return (_a = this.onActionCallback) === null || _a === void 0 ? void 0 : _a.call(this, 'toggleMute'); },
+                click: () => this.onActionCallback?.('toggleMute'),
             },
             {
                 label: 'Picture-in-Picture',
                 accelerator: 'CmdOrCtrl+P',
-                click: () => { var _a; return (_a = this.onActionCallback) === null || _a === void 0 ? void 0 : _a.call(this, 'togglePip'); },
+                click: () => this.onActionCallback?.('togglePip'),
             },
             { type: 'separator' },
             {
-                label: ((_a = this.mainWindow) === null || _a === void 0 ? void 0 : _a.isVisible()) ? 'Hide to Tray' : 'Show FlixDesk',
+                label: this.mainWindow?.isVisible() ? 'Hide to Tray' : 'Show FlixDesk',
                 click: () => this.toggleWindow(),
             },
             {
                 label: 'Preferences...',
                 accelerator: 'CmdOrCtrl+,',
-                click: () => { var _a; return (_a = this.onActionCallback) === null || _a === void 0 ? void 0 : _a.call(this, 'openSettings'); },
+                click: () => this.onActionCallback?.('openSettings'),
             },
             { type: 'separator' },
             {

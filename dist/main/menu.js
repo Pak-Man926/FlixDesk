@@ -1,9 +1,9 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.buildAppMenu = void 0;
+exports.buildAppMenu = buildAppMenu;
 const electron_1 = require("electron");
-
 function buildAppMenu(mainWindow, onAction) {
+    const isMac = process.platform === 'darwin';
     const template = [
         {
             label: 'FlixDesk',
@@ -120,4 +120,3 @@ function buildAppMenu(mainWindow, onAction) {
     ];
     return electron_1.Menu.buildFromTemplate(template);
 }
-exports.buildAppMenu = buildAppMenu;

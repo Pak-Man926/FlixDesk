@@ -2,31 +2,32 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.PlayerSync = void 0;
 const electron_1 = require("electron");
-
 class PlayerSync {
-    constructor() {
-        this.activeVideo = null;
-        this.syncInterval = null;
-        this.lastState = {
-            isPlaying: false,
-            isBuffering: false,
-            title: 'Netflix',
-            subTitle: '',
-            seasonEpisode: '',
-            artworkUrl: '',
-            duration: 0,
-            currentTime: 0,
-            volume: 1.0,
-            isMuted: false,
-            playbackRate: 1.0,
-        };
-    }
+    activeVideo = null;
+    syncInterval = null;
+    lastState = {
+        isPlaying: false,
+        isBuffering: false,
+        title: 'Netflix',
+        subTitle: '',
+        seasonEpisode: '',
+        artworkUrl: '',
+        duration: 0,
+        currentTime: 0,
+        volume: 1.0,
+        isMuted: false,
+        playbackRate: 1.0,
+    };
+    constructor() { }
     start() {
+        // Continuously check for video element attachment
         this.attachVideoListeners();
+        // Polling interval for metadata and time sync
         this.syncInterval = setInterval(() => {
             this.attachVideoListeners();
             this.syncState();
         }, 1000);
+        // Listen for commands from Main Process (MPRIS / Tray / Shortcuts)
         electron_1.ipcRenderer.on('player:command', (_event, { command, data }) => {
             this.handleCommand(command, data);
         });
@@ -69,6 +70,7 @@ class PlayerSync {
         let subTitle;
         let seasonEpisode;
         let artworkUrl;
+        // 1. Try DOM elements for active video title in player UI
         const titleHeader = document.querySelector('.video-title h4, [data-uia="video-title"] h4');
         const titleSpans = document.querySelectorAll('.video-title span, [data-uia="video-title"] span');
         if (titleHeader && titleHeader.innerText.trim()) {
@@ -89,6 +91,7 @@ class PlayerSync {
                 subTitle = spanTexts[1];
             }
         }
+        // 2. Fallback: Parse document title (e.g. "Netflix - Stranger Things: Season 4: Chapter 1...")
         if (title === 'Netflix' && document.title && document.title.includes('Netflix -')) {
             const cleanDocTitle = document.title.replace('Netflix -', '').trim();
             const parts = cleanDocTitle.split(':').map((p) => p.trim());
@@ -102,6 +105,7 @@ class PlayerSync {
                 subTitle = parts.slice(2).join(': ');
             }
         }
+        // 3. Try to extract thumbnail / poster artwork
         const boxartImg = document.querySelector('.evidence-item-poster, .previewModal--boxart img, .title-card img');
         if (boxartImg && boxartImg.src) {
             artworkUrl = boxartImg.src;
@@ -130,6 +134,7 @@ class PlayerSync {
             isMuted,
             playbackRate,
         };
+        // Emit if anything changed significantly
         this.lastState = newState;
         electron_1.ipcRenderer.send('player:state', newState);
     }
@@ -164,6 +169,7 @@ class PlayerSync {
                 }
                 break;
             case 'next':
+                // Try clicking next episode button
                 const nextBtn = document.querySelector('[data-uia="control-next"], [data-uia="next-episode-seamless-button"], .button-nfVideosNext');
                 if (nextBtn) {
                     nextBtn.click();
@@ -179,7 +185,7 @@ class PlayerSync {
             case 'seek':
                 if (typeof data === 'number') {
                     if (player) {
-                        const targetMs = Math.max(0, ((video === null || video === void 0 ? void 0 : video.currentTime) || 0) + data) * 1000;
+                        const targetMs = Math.max(0, (video?.currentTime || 0) + data) * 1000;
                         player.seek(targetMs);
                     }
                     else if (video) {
@@ -214,6 +220,7 @@ class PlayerSync {
                 }
                 break;
         }
+        // Immediate sync after command
         setTimeout(() => this.syncState(), 100);
     }
     destroy() {
