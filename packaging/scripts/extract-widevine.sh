@@ -9,15 +9,50 @@ echo "=================================================="
 echo " FlixDesk - Widevine CDM Local Setup Utility"
 echo "=================================================="
 
-# Check if Google Chrome or Chromium already has Widevine
-SYSTEM_WIDEVINE="/opt/google/chrome/WidevineCdm/_platform_specific/linux_x64/libwidevinecdm.so"
-if [ -f "$SYSTEM_WIDEVINE" ]; then
-    echo "Found system Google Chrome Widevine at: $SYSTEM_WIDEVINE"
-    mkdir -p "$PLATFORM_DIR"
-    cp -r /opt/google/chrome/WidevineCdm/* "$TARGET_DIR/"
-    echo "Successfully linked system Widevine to FlixDesk."
+# Check if FlixDesk already has Widevine installed
+if [ -f "$PLATFORM_DIR/libwidevinecdm.so" ] || [ -f "$TARGET_DIR/libwidevinecdm.so" ]; then
+    echo "✓ Widevine CDM is already installed for FlixDesk at: $TARGET_DIR"
     exit 0
 fi
+
+# Check if an existing browser already has Widevine
+CANDIDATE_DIRS=(
+    "/opt/google/chrome/WidevineCdm"
+    "/opt/google/chrome-beta/WidevineCdm"
+    "/opt/brave.com/brave/WidevineCdm"
+    "/usr/lib/chromium/WidevineCdm"
+    "/usr/lib/chromium-browser/WidevineCdm"
+    "/opt/microsoft/msedge/WidevineCdm"
+    "/opt/vivaldi/WidevineCdm"
+)
+
+# Also check user component updater paths (Brave, Chrome, Chromium)
+for comp_dir in "${HOME}/.config/BraveSoftware/Brave-Browser/WidevineCdm"/* \
+                "${HOME}/.config/google-chrome/WidevineCdm"/* \
+                "${HOME}/.config/chromium/WidevineCdm"/* \
+                "${HOME}/.config/microsoft-edge/WidevineCdm"/*; do
+    if [ -d "$comp_dir" ]; then
+        CANDIDATE_DIRS+=("$comp_dir")
+    fi
+done
+
+for dir in "${CANDIDATE_DIRS[@]}"; do
+    if [ -f "$dir/_platform_specific/linux_x64/libwidevinecdm.so" ]; then
+        echo "Found Widevine CDM from existing browser at: $dir"
+        mkdir -p "$PLATFORM_DIR"
+        cp -r "$dir"/* "$TARGET_DIR/"
+        echo "Successfully copied Widevine to FlixDesk ($TARGET_DIR)."
+        exit 0
+    elif [ -f "$dir/libwidevinecdm.so" ]; then
+        echo "Found Widevine CDM (flat) at: $dir"
+        mkdir -p "$PLATFORM_DIR"
+        cp -r "$dir"/* "$TARGET_DIR/"
+        mkdir -p "$PLATFORM_DIR"
+        cp "$dir/libwidevinecdm.so" "$PLATFORM_DIR/"
+        echo "Successfully copied Widevine to FlixDesk ($TARGET_DIR)."
+        exit 0
+    fi
+done
 
 echo "Downloading official Google Chrome package to extract Widevine CDM..."
 TMP_WORK_DIR=$(mktemp -d)

@@ -1,28 +1,12 @@
 #!/bin/bash
 set -e
 
-echo "=================================================="
-echo " Starting FlixDesk (Official Chrome DRM Engine)"
-echo "=================================================="
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 
-CHROME_BIN="/opt/google/chrome/google-chrome"
-if [ ! -f "$CHROME_BIN" ]; then
-    CHROME_BIN=$(which google-chrome-stable || which google-chrome)
+# Check if Google Chrome is installed; otherwise fall back to any installed browser
+if which google-chrome-stable >/dev/null 2>&1 || which google-chrome >/dev/null 2>&1 || [ -x "/opt/google/chrome/google-chrome" ]; then
+    exec "$DIR/run_browser.sh" --browser chrome "$@"
+else
+    echo "[FlixDesk] Notice: Google Chrome is not installed. Auto-detecting available browser..."
+    exec "$DIR/run_browser.sh" "$@"
 fi
-
-PROFILE_DIR="$HOME/.config/FlixDesk/chrome_profile"
-mkdir -p "$PROFILE_DIR"
-
-# Launch in dedicated, frameless standalone app mode
-exec "$CHROME_BIN" \
-    --app="https://www.netflix.com/browse" \
-    --user-data-dir="$PROFILE_DIR" \
-    --class="FlixDesk" \
-    --name="FlixDesk" \
-    --window-size=1280,720 \
-    --enable-features=VaapiVideoDecoder,VaapiVideoDecodeLinuxGL \
-    --enable-accelerated-video-decode \
-    --enable-gpu-rasterization \
-    --ignore-gpu-blocklist \
-    --autoplay-policy=no-user-gesture-required \
-    "$@"

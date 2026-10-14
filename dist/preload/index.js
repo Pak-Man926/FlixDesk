@@ -23,6 +23,7 @@ window.addEventListener('DOMContentLoaded', () => {
         playerSync.start();
         autoSkipper.start();
         (0, force_1080p_1.inject1080pUnlocker)();
+        // Verify DRM / Widevine EME capability
         if (navigator.requestMediaKeySystemAccess) {
             navigator.requestMediaKeySystemAccess('com.widevine.alpha', [
                 {
@@ -31,10 +32,10 @@ window.addEventListener('DOMContentLoaded', () => {
                     videoCapabilities: [{ contentType: 'video/mp4;codecs="avc1.42E01E"' }],
                 },
             ])
-            .then(() => {
+                .then(() => {
                 console.log('[FlixDesk DRM] com.widevine.alpha is supported and active!');
             })
-            .catch((err) => {
+                .catch((err) => {
                 console.warn('[FlixDesk DRM] com.widevine.alpha check:', err.message);
             });
         }
