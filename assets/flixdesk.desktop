@@ -1,0 +1,20 @@
+[Desktop Entry]
+Name=FlixDesk
+GenericName=Netflix Desktop Client
+Comment=Unofficial Netflix desktop client for Linux with Widevine DRM and MPRIS
+Exec=/bin/bash -c "exec $(dirname %k)/run.sh"
+Icon=flixdesk
+Type=Application
+StartupNotify=true
+StartupWMClass=FlixDesk
+Categories=AudioVideo;Video;Player;TV;Network;
+Keywords=netflix;stream;video;movie;tv;series;mpris;media;brave;chrome;firefox;
+Actions=BrowserMode;NativeMode;
+
+[Desktop Action BrowserMode]
+Name=Launch in Browser App Mode
+Exec=/bin/bash -c "exec $(dirname %k)/run_browser.sh"
+
+[Desktop Action NativeMode]
+Name=Launch Native Client
+Exec=/bin/bash -c "exec $(dirname %k)/run.sh --native"
