@@ -43,7 +43,7 @@
       "libasound2"
     ],
     "recommended": [
-      "google-chrome-stable | chromium-browser | chromium"
+      "google-chrome-stable | brave-browser | chromium-browser | chromium | firefox"
     ]
   }
 }

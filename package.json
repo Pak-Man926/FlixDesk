@@ -8,8 +8,7 @@
     "start": "electron --no-sandbox --disable-gpu-sandbox .",
     "build:ts": "tsc",
     "build": "npm run build:ts && electron-builder --linux",
-    "build:dir": "npm run build:ts && electron-builder --linux --dir",
-    "build:flatpak": "flatpak-builder --force-clean --user --install-deps-from=flathub build-dir packaging/flatpak/io.github.Pak_Man926.FlixDesk.yml"
+    "build:dir": "npm run build:ts && electron-builder --linux --dir"
   },
   "keywords": [
     "netflix",
@@ -17,10 +16,11 @@
     "mpris",
     "widevine",
     "desktop-client",
-    "flatpak",
-    "flathub",
     "pop-os",
-    "electron"
+    "electron",
+    "brave",
+    "chrome",
+    "standalone"
   ],
   "author": {
     "name": "Pak-Man926",

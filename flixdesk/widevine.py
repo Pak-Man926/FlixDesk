@@ -21,14 +21,11 @@ class WidevineManager:
         if self._info is not None:
             return self._info
 
+        import glob
+
         home = Path.home()
         candidates = [
-            # 1. Flatpak extra-data location
-            {
-                "path": "/app/extra/WidevineCdm/_platform_specific/linux_x64/libwidevinecdm.so",
-                "source": "Flatpak Extra Data",
-            },
-            # 2. Local FlixDesk AppData (extracted via extract-widevine.sh)
+            # 1. Local FlixDesk AppData (extracted via extract-widevine.sh)
             {
                 "path": str(home / ".config/FlixDesk/WidevineCdm/_platform_specific/linux_x64/libwidevinecdm.so"),
                 "source": "FlixDesk Local AppData",
@@ -36,6 +33,19 @@ class WidevineManager:
             {
                 "path": str(home / ".config/FlixDesk/WidevineCdm/libwidevinecdm.so"),
                 "source": "FlixDesk Flat AppData",
+            },
+            # 2. Brave Browser (System installations & user-level component updates)
+            {
+                "path": "/opt/brave.com/brave/WidevineCdm/_platform_specific/linux_x64/libwidevinecdm.so",
+                "source": "Brave Browser System",
+            },
+            {
+                "path": "/opt/brave.com/brave/resources/widevine_cdm/_platform_specific/linux_x64/libwidevinecdm.so",
+                "source": "Brave Browser Resources",
+            },
+            {
+                "path": str(home / ".config/BraveSoftware/Brave-Browser/WidevineCdm/libwidevinecdm.so"),
+                "source": "Brave User CDM Direct",
             },
             # 3. Google Chrome (Stable, Beta, Unstable)
             {
@@ -63,14 +73,10 @@ class WidevineManager:
                 "path": "/usr/lib/x86_64-linux-gnu/chromium/WidevineCdm/_platform_specific/linux_x64/libwidevinecdm.so",
                 "source": "Debian/Ubuntu Multiarch Chromium",
             },
-            # 5. Brave Browser
+            # 5. Microsoft Edge for Linux
             {
-                "path": "/opt/brave.com/brave/WidevineCdm/_platform_specific/linux_x64/libwidevinecdm.so",
-                "source": "Brave Browser",
-            },
-            {
-                "path": str(home / ".config/BraveSoftware/Brave-Browser/WidevineCdm/libwidevinecdm.so"),
-                "source": "User Brave CDM",
+                "path": "/opt/microsoft/msedge/WidevineCdm/_platform_specific/linux_x64/libwidevinecdm.so",
+                "source": "Microsoft Edge Linux",
             },
             # 6. Vivaldi Browser
             {
@@ -81,13 +87,9 @@ class WidevineManager:
                 "path": "/var/opt/vivaldi/WidevineCdm/libwidevinecdm.so",
                 "source": "Vivaldi Opt Var",
             },
-            # 7. Microsoft Edge for Linux
-            {
-                "path": "/opt/microsoft/msedge/WidevineCdm/_platform_specific/linux_x64/libwidevinecdm.so",
-                "source": "Microsoft Edge Linux",
-            },
         ]
 
+        # Check explicit static paths
         for item in candidates:
             if os.path.isfile(item["path"]):
                 self._info = {
@@ -98,6 +100,34 @@ class WidevineManager:
                 print(f"[Widevine] Found Widevine CDM from {item['source']}")
                 print(f"[Widevine] Library: {item['path']}")
                 return self._info
+
+        # Dynamic glob search across browser user component directories
+        glob_patterns = [
+            (str(home / ".config/BraveSoftware/Brave-Browser*/WidevineCdm/*/_platform_specific/linux_x64/libwidevinecdm.so"), "Brave User Component"),
+            (str(home / ".config/BraveSoftware/Brave-Browser*/WidevineCdm/*/libwidevinecdm.so"), "Brave User Component (Flat)"),
+            (str(home / ".config/google-chrome*/WidevineCdm/*/_platform_specific/linux_x64/libwidevinecdm.so"), "Google Chrome User Component"),
+            (str(home / ".config/chromium/WidevineCdm/*/_platform_specific/linux_x64/libwidevinecdm.so"), "Chromium User Component"),
+            (str(home / ".config/microsoft-edge*/WidevineCdm/*/_platform_specific/linux_x64/libwidevinecdm.so"), "Edge User Component"),
+            (str(home / ".mozilla/firefox/*default*/gmp-widevinecdm/*/libwidevinecdm.so"), "Mozilla Firefox GMP Widevine"),
+            ("/var/lib/snapd/snap/chromium/current/usr/lib/chromium-browser/WidevineCdm/_platform_specific/linux_x64/libwidevinecdm.so", "Snap Chromium Widevine"),
+            ("/var/lib/snapd/snap/brave/current/opt/brave.com/brave/WidevineCdm/_platform_specific/linux_x64/libwidevinecdm.so", "Snap Brave Widevine"),
+        ]
+
+        for pattern, source_label in glob_patterns:
+            matches = glob.glob(pattern)
+            if matches:
+                # Pick the latest modified or highest version
+                matches.sort(reverse=True)
+                target = matches[0]
+                if os.path.isfile(target):
+                    self._info = {
+                        "found": True,
+                        "path": target,
+                        "source": source_label,
+                    }
+                    print(f"[Widevine] Found Widevine CDM from {source_label}")
+                    print(f"[Widevine] Library: {target}")
+                    return self._info
 
         print("[Widevine] No Widevine CDM library found on this system.")
         self._info = {"found": False, "path": None, "source": None}

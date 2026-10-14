@@ -66,23 +66,7 @@ class WidevineManager {
         const home = process.env.HOME || '';
         const userData = electron_1.app ? electron_1.app.getPath('userData') : path.join(home, '.config', 'FlixDesk');
         const candidatePaths = [
-            // 1. Flatpak sandbox extra-data location
-            {
-                path: '/app/extra/WidevineCdm/_platform_specific/linux_x64/libwidevinecdm.so',
-                manifest: '/app/extra/WidevineCdm/manifest.json',
-                source: 'Flatpak Extra-Data',
-            },
-            {
-                path: '/app/extra/libwidevinecdm.so',
-                manifest: '/app/extra/manifest.json',
-                source: 'Flatpak Extra-Data Direct',
-            },
-            {
-                path: '/app/lib/WidevineCdm/_platform_specific/linux_x64/libwidevinecdm.so',
-                manifest: '/app/lib/WidevineCdm/manifest.json',
-                source: 'Flatpak Runtime Lib',
-            },
-            // 2. Application user data directory (local download / updater)
+            // 1. Application user data directory (local download / updater)
             {
                 path: path.join(userData, 'WidevineCdm', '_platform_specific', 'linux_x64', 'libwidevinecdm.so'),
                 manifest: path.join(userData, 'WidevineCdm', 'manifest.json'),
@@ -92,6 +76,22 @@ class WidevineManager {
                 path: path.join(userData, 'WidevineCdm', 'libwidevinecdm.so'),
                 manifest: path.join(userData, 'WidevineCdm', 'manifest.json'),
                 source: 'FlixDesk AppData Direct',
+            },
+            // 2. Brave Browser
+            {
+                path: '/opt/brave.com/brave/WidevineCdm/_platform_specific/linux_x64/libwidevinecdm.so',
+                manifest: '/opt/brave.com/brave/WidevineCdm/manifest.json',
+                source: 'Brave Browser System',
+            },
+            {
+                path: '/opt/brave.com/brave/resources/widevine_cdm/_platform_specific/linux_x64/libwidevinecdm.so',
+                manifest: '/opt/brave.com/brave/resources/widevine_cdm/manifest.json',
+                source: 'Brave Browser Resources',
+            },
+            {
+                path: path.join(home, '.config/BraveSoftware/Brave-Browser/WidevineCdm/libwidevinecdm.so'),
+                manifest: path.join(home, '.config/BraveSoftware/Brave-Browser/WidevineCdm/manifest.json'),
+                source: 'User Brave CDM Direct',
             },
             // 3. Google Chrome Stable / Beta / Unstable
             {
@@ -125,16 +125,11 @@ class WidevineManager {
                 manifest: '/usr/lib/x86_64-linux-gnu/chromium/WidevineCdm/manifest.json',
                 source: 'Debian/Ubuntu Multiarch Chromium',
             },
-            // 5. Brave Browser
+            // 5. Microsoft Edge for Linux
             {
-                path: '/opt/brave.com/brave/WidevineCdm/_platform_specific/linux_x64/libwidevinecdm.so',
-                manifest: '/opt/brave.com/brave/WidevineCdm/manifest.json',
-                source: 'Brave Browser',
-            },
-            {
-                path: path.join(home, '.config/BraveSoftware/Brave-Browser/WidevineCdm/libwidevinecdm.so'),
-                manifest: path.join(home, '.config/BraveSoftware/Brave-Browser/WidevineCdm/manifest.json'),
-                source: 'User Brave CDM',
+                path: '/opt/microsoft/msedge/WidevineCdm/_platform_specific/linux_x64/libwidevinecdm.so',
+                manifest: '/opt/microsoft/msedge/WidevineCdm/manifest.json',
+                source: 'Microsoft Edge Linux',
             },
             // 6. Vivaldi Browser
             {
@@ -147,13 +142,38 @@ class WidevineManager {
                 manifest: '/var/opt/vivaldi/WidevineCdm/manifest.json',
                 source: 'Vivaldi Opt Var',
             },
-            // 7. Microsoft Edge for Linux
-            {
-                path: '/opt/microsoft/msedge/WidevineCdm/_platform_specific/linux_x64/libwidevinecdm.so',
-                manifest: '/opt/microsoft/msedge/WidevineCdm/manifest.json',
-                source: 'Microsoft Edge Linux',
-            },
         ];
+        // Check version-specific user component directories (e.g. Brave & Chrome component updaters)
+        const browserComponentRoots = [
+            { root: path.join(home, '.config/BraveSoftware/Brave-Browser/WidevineCdm'), source: 'Brave User Component' },
+            { root: path.join(home, '.config/google-chrome/WidevineCdm'), source: 'Chrome User Component' },
+            { root: path.join(home, '.config/chromium/WidevineCdm'), source: 'Chromium User Component' },
+            { root: path.join(home, '.config/microsoft-edge/WidevineCdm'), source: 'Edge User Component' },
+        ];
+        for (const comp of browserComponentRoots) {
+            if (fs.existsSync(comp.root)) {
+                try {
+                    const entries = fs.readdirSync(comp.root, { withFileTypes: true });
+                    for (const entry of entries) {
+                        if (entry.isDirectory()) {
+                            candidatePaths.push({
+                                path: path.join(comp.root, entry.name, '_platform_specific', 'linux_x64', 'libwidevinecdm.so'),
+                                manifest: path.join(comp.root, entry.name, 'manifest.json'),
+                                source: `${comp.source} (${entry.name})`,
+                            });
+                            candidatePaths.push({
+                                path: path.join(comp.root, entry.name, 'libwidevinecdm.so'),
+                                manifest: path.join(comp.root, entry.name, 'manifest.json'),
+                                source: `${comp.source} Flat (${entry.name})`,
+                            });
+                        }
+                    }
+                }
+                catch {
+                    // Ignore read errors
+                }
+            }
+        }
         for (const candidate of candidatePaths) {
             if (fs.existsSync(candidate.path)) {
                 let version = '4.10.2830.0'; // Modern fallback version
@@ -191,6 +211,7 @@ class WidevineManager {
             const cdmDir = info.path.includes('_platform_specific')
                 ? path.resolve(path.dirname(info.path), '../..')
                 : path.dirname(info.path);
+            // Support all variations of Chromium Widevine command-line switches
             electron_1.app.commandLine.appendSwitch('widevine-cdm-path', cdmDir);
             electron_1.app.commandLine.appendSwitch('widevine-cdm-version', info.version);
             electron_1.app.commandLine.appendSwitch('widevinecdm-path', info.path);

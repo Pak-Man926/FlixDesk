@@ -46,7 +46,7 @@ const ipc_1 = require("./ipc");
 const enableHwAccel = store_1.store.get('enableHardwareAcceleration');
 const enableWayland = store_1.store.get('enableWayland');
 widevine_1.widevineManager.applySwitches(enableHwAccel, enableWayland);
-// Dynamic Desktop Chrome User-Agent matching Electron's Chromium engine
+// Dynamic Chrome User-Agent matching Electron's Chromium engine
 const chromeVersion = process.versions.chrome || '128.0.0.0';
 const DEFAULT_USER_AGENT = `Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/${chromeVersion} Safari/537.36`;
 let mainWindow = null;
@@ -187,14 +187,18 @@ function createSettingsWindow() {
 }
 function configureSession() {
     const userAgent = store_1.store.get('customUserAgent') || DEFAULT_USER_AGENT;
+    // Set user agent across default session and app fallback
     electron_1.session.defaultSession.setUserAgent(userAgent);
     electron_1.app.userAgentFallback = userAgent;
+    // Strip Electron identifier from request headers
     electron_1.session.defaultSession.webRequest.onBeforeSendHeaders((details, callback) => {
-        const requestHeaders = Object.assign({}, details.requestHeaders);
+        const requestHeaders = { ...details.requestHeaders };
         requestHeaders['User-Agent'] = userAgent;
         callback({ cancel: false, requestHeaders });
     });
+    // Automatically grant DRM (Widevine / protected-media-identifier) and media permissions
     electron_1.session.defaultSession.setPermissionRequestHandler((webContents, permission, callback) => {
+        // Chromium permission for Widevine / DRM is 'protected-media-identifier' or 'mediaKeySystem'
         console.log(`[FlixDesk Session] Permission requested: ${permission}`);
         callback(true);
     });
@@ -223,6 +227,7 @@ function handleAppAction(action, data) {
     }
 }
 electron_1.app.whenReady().then(async () => {
+    // 1. Support Widevine Components API if present (Castlabs / Widevine EVS)
     try {
         const electronModule = require('electron');
         if (electronModule.components && typeof electronModule.components.whenReady === 'function') {
