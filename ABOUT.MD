@@ -17,4 +17,5 @@ The client's codebase (defined in [README.md](file:///home/pak_man/Desktop/Netfl
 
 *   **GUI & Integrations:** Built with Python and Qt (PySide6) to handle the main UI frame, settings, MPRIS interface, and system tray.
 *   **Web Engine Overrides:** JavaScript injection inside `QWebEngineView` to inject behavior like [force_1080p.js](file:///home/pak_man/Desktop/Netflix%20Client/flixdesk/scripts/force_1080p.js) and [player_sync.js](file:///home/pak_man/Desktop/Netflix%20Client/flixdesk/scripts/player_sync.js) directly into the Netflix web player.
-*   **Packaging:** Supported targets for AUR and a sandboxed Universal Flatpak configuration located in [packaging/flatpak](file:///home/pak_man/Desktop/Netflix%20Client/packaging/flatpak).
+*   **Universal Standalone Execution:** Dual execution modes supported out of the box — standalone web engine mode supporting multiple browsers (Brave, Google Chrome, Mozilla Firefox, Chromium, Microsoft Edge, Vivaldi) via `run_browser.sh`, and native desktop container mode via `run.sh` / `flixdesk.py`.
+*   **Desktop Integration:** Direct local desktop shortcut integration via `install-desktop.sh` without requiring Flathub or sandboxing overhead.
