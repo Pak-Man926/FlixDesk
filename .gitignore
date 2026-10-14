@@ -42,11 +42,10 @@ venv.bak/
 .coverage
 htmlcov/
 
-# 2. Flatpak & Packaging Build Directories
+# 2. Packaging & Binary Build Directories
+dist-packages/
 build-dir/
-.flatpak-builder/
 repo/
-*.flatpak
 *.AppImage
 *.deb
 *.rpm
@@ -70,6 +69,8 @@ yarn-error.log*
 .config/
 qt_profile/
 chrome_profile/
+browser_profile/
+firefox_profile/
 
 # 5. IDE & Operating System Files
 .vscode/
